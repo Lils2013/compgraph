@@ -23,7 +23,8 @@ public class LoadImageApp extends Component {
 
     public LoadImageApp() {
         try {
-            img = ImageIO.read(new File("linear_gradient_east.png"));
+            img = ImageIO.read(new File("Lenna.png"));
+            toGrayscale(img);
 //            thresholding(img);
 //            randomDithering(img);
 //            orderedDithering2x2(img);
@@ -32,15 +33,32 @@ public class LoadImageApp extends Component {
         }
     }
 
+    private void toGrayscale(BufferedImage img) {
+        int width = img.getWidth();
+        int height = img.getHeight();
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                int rgb = img.getRGB(col, row);
+                int r = (rgb>>16)&0xff;
+                int g = (rgb>>8)&0xff;
+                int b = (rgb)&0xff;
+                double intensity = 0.299*r + 0.587*g + 0.114*b;
+                int gray = (int) (Math.round(intensity));
+                img.setRGB(col,row,new Color(gray, gray, gray).getRGB());
+            }
+        }
+    }
+
     private void thresholding(BufferedImage img) {
         int width = img.getWidth();
         int height = img.getHeight();
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
-                Color color = new Color(img.getRGB(col, row), false);
-                int r = color.getRed();
-                int g = color.getGreen();
-                int b = color.getBlue();
+                int rgb = img.getRGB(col, row);
+                int r = (rgb>>16)&0xff;
+                int g = (rgb>>8)&0xff;
+                int b = (rgb)&0xff;
+                System.out.println(r + " " + g + " " + b);
                 double intensity = 0.299*r + 0.587*g + 0.114*b;
                 if (intensity > THRESHOLD) {
                     img.setRGB(col,row,Color.WHITE.getRGB());
@@ -58,10 +76,10 @@ public class LoadImageApp extends Component {
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int thr = random.nextInt(255);
-                Color color = new Color(img.getRGB(col, row), false);
-                int r = color.getRed();
-                int g = color.getGreen();
-                int b = color.getBlue();
+                int rgb = img.getRGB(col, row);
+                int r = (rgb>>16)&0xff;
+                int g = (rgb>>8)&0xff;
+                int b = (rgb)&0xff;
                 double intensity = 0.299*r + 0.587*g + 0.114*b;
                 if (intensity > thr) {
                     img.setRGB(col,row,Color.WHITE.getRGB());
@@ -81,10 +99,10 @@ public class LoadImageApp extends Component {
         };
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
-                Color color = new Color(img.getRGB(col, row), false);
-                int r = color.getRed();
-                int g = color.getGreen();
-                int b = color.getBlue();
+                int rgb = img.getRGB(col, row);
+                int r = (rgb>>16)&0xff;
+                int g = (rgb>>8)&0xff;
+                int b = (rgb)&0xff;
                 int gray = (r+g+b)/3;
                 int lol = (int)(gray + 255*(matrix[col % 2][row % 2] / 4.0 - 1.0/2));
                 if (lol > THRESHOLD) {
@@ -107,10 +125,10 @@ public class LoadImageApp extends Component {
         };
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
-                Color color = new Color(img.getRGB(col, row), false);
-                int r = color.getRed();
-                int g = color.getGreen();
-                int b = color.getBlue();
+                int rgb = img.getRGB(col, row);
+                int r = (rgb>>16)&0xff;
+                int g = (rgb>>8)&0xff;
+                int b = (rgb)&0xff;
                 int gray = (r+g+b)/3;
                 int lol = (int)(gray + 255*(matrix[col % 4][row % 4] / 16.0 - 1.0/2));
                 if (lol > THRESHOLD) {

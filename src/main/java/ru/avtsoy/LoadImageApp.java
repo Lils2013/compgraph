@@ -22,9 +22,11 @@ public class LoadImageApp {
                 int r = (rgb >> 16) & 0xff;
                 int g = (rgb >> 8) & 0xff;
                 int b = (rgb) & 0xff;
-                double intensity = 0.299 * r + 0.587 * g + 0.114 * b;
-                int gray = (int) (Math.round(intensity));
-                img.setRGB(col, row, new Color(gray, gray, gray).getRGB());
+                if (!(r == g && g == b)) {
+                    double intensity = 0.299 * r + 0.587 * g + 0.114 * b;
+                    int gray = (int) (Math.round(intensity));
+                    img.setRGB(col, row, new Color(gray, gray, gray).getRGB());
+                }
             }
         }
         return img;
@@ -36,10 +38,7 @@ public class LoadImageApp {
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int rgb = img.getRGB(col, row);
-                int r = (rgb >> 16) & 0xff;
-                int g = (rgb >> 8) & 0xff;
-                int b = (rgb) & 0xff;
-                double intensity = 0.299 * r + 0.587 * g + 0.114 * b;
+                double intensity = (rgb) & 0xff;
                 if (intensity > THRESHOLD) {
                     img.setRGB(col, row, Color.WHITE.getRGB());
                 } else {
@@ -58,10 +57,7 @@ public class LoadImageApp {
             for (int col = 0; col < width; col++) {
                 int thr = random.nextInt(255);
                 int rgb = img.getRGB(col, row);
-                int r = (rgb >> 16) & 0xff;
-                int g = (rgb >> 8) & 0xff;
-                int b = (rgb) & 0xff;
-                double intensity = 0.299 * r + 0.587 * g + 0.114 * b;
+                double intensity = (rgb) & 0xff;
                 if (intensity > thr) {
                     img.setRGB(col, row, Color.WHITE.getRGB());
                 } else {
@@ -82,12 +78,9 @@ public class LoadImageApp {
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int rgb = img.getRGB(col, row);
-                int r = (rgb >> 16) & 0xff;
-                int g = (rgb >> 8) & 0xff;
-                int b = (rgb) & 0xff;
-                int gray = (r + g + b) / 3;
-                int lol = (int) (gray + 255 * (matrix[col % 2][row % 2] / 4.0 - 1.0 / 2));
-                if (lol > THRESHOLD) {
+                int gray = (rgb) & 0xff;
+                int intensity = (int) (gray + 255 * (matrix[col % 2][row % 2] / 4.0 - 1.0 / 2));
+                if (intensity > THRESHOLD) {
                     img.setRGB(col, row, Color.WHITE.getRGB());
                 } else {
                     img.setRGB(col, row, Color.BLACK.getRGB());
@@ -109,12 +102,9 @@ public class LoadImageApp {
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int rgb = img.getRGB(col, row);
-                int r = (rgb >> 16) & 0xff;
-                int g = (rgb >> 8) & 0xff;
-                int b = (rgb) & 0xff;
-                int gray = (r + g + b) / 3;
-                int lol = (int) (gray + 255 * (matrix[col % 4][row % 4] / 16.0 - 1.0 / 2));
-                if (lol > THRESHOLD) {
+                int gray = (rgb) & 0xff;
+                int intensity = (int) (gray + 255 * (matrix[col % 4][row % 4] / 16.0 - 1.0 / 2));
+                if (intensity > THRESHOLD) {
                     img.setRGB(col, row, Color.WHITE.getRGB());
                 } else {
                     img.setRGB(col, row, Color.BLACK.getRGB());
@@ -132,7 +122,7 @@ public class LoadImageApp {
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int rgb = img.getRGB(col, row);
-                int gray = (rgb >> 16) & 0xff; //assuming image is already in greyscale
+                int gray = (rgb) & 0xff; //assuming image is already in grayscale
                 if (gray + err[col][row] > THRESHOLD) {
                     img.setRGB(col, row, Color.WHITE.getRGB());
                     error = gray + err[col][row] - 255;
@@ -156,7 +146,7 @@ public class LoadImageApp {
             if (row % 2 == 0) {
                 for (int col = 0; col < width; col++) {
                     int rgb = img.getRGB(col, row);
-                    int gray = (rgb >> 16) & 0xff; //assuming image is already in greyscale
+                    int gray = (rgb) & 0xff; //assuming image is already in grayscale
                     if (gray + err[col][row] > THRESHOLD) {
                         img.setRGB(col, row, Color.WHITE.getRGB());
                         error = gray + err[col][row] - 255;
@@ -166,13 +156,11 @@ public class LoadImageApp {
                     }
                     if (col + 1 < width)
                         err[col + 1][row] += error;
-                    else if (row + 1 < height)
-                        err[col][row + 1] += error;
                 }
             } else {
                 for (int col = width - 1; col >= 0; col--) {
                     int rgb = img.getRGB(col, row);
-                    int gray = (rgb >> 16) & 0xff; //assuming image is already in greyscale
+                    int gray = (rgb >> 16) & 0xff; //assuming image is already in grayscale
                     if (gray + err[col][row] > THRESHOLD) {
                         img.setRGB(col, row, Color.WHITE.getRGB());
                         error = gray + err[col][row] - 255;
@@ -182,8 +170,6 @@ public class LoadImageApp {
                     }
                     if (col - 1 >= 0)
                         err[col - 1][row] += error;
-                    else if (row + 1 < height)
-                        err[col][row + 1] += error;
                 }
             }
         }
@@ -198,7 +184,7 @@ public class LoadImageApp {
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int rgb = img.getRGB(col, row);
-                int gray = (rgb >> 16) & 0xff; //assuming image is already in greyscale
+                int gray = (rgb) & 0xff; //assuming image is already in grayscale
                 if (gray + err[col][row] > THRESHOLD) {
                     img.setRGB(col, row, Color.WHITE.getRGB());
                     error = gray + err[col][row] - 255;
@@ -228,7 +214,7 @@ public class LoadImageApp {
             if (row % 2 == 0) {
                 for (int col = 0; col < width; col++) {
                     int rgb = img.getRGB(col, row);
-                    int gray = (rgb >> 16) & 0xff; //assuming image is already in greyscale
+                    int gray = (rgb) & 0xff; //assuming image is already in greyscale
                     if (gray + err[col][row] > THRESHOLD) {
                         img.setRGB(col, row, Color.WHITE.getRGB());
                         error = gray + err[col][row] - 255;
@@ -248,7 +234,7 @@ public class LoadImageApp {
             } else {
                 for (int col = width - 1; col >= 0; col--) {
                     int rgb = img.getRGB(col, row);
-                    int gray = (rgb >> 16) & 0xff; //assuming image is already in greyscale
+                    int gray = (rgb) & 0xff; //assuming image is already in greyscale
                     if (gray + err[col][row] > THRESHOLD) {
                         img.setRGB(col, row, Color.WHITE.getRGB());
                         error = gray + err[col][row] - 255;
@@ -271,27 +257,39 @@ public class LoadImageApp {
     }
 
     public static void main(String[] args) throws IOException {
-        BufferedImage img = ImageIO.read(new File(args[0]));
-//        toGrayscale(img);
-//            thresholding(img);
-//            randomDithering(img);
-//            orderedDithering2x2(img);
-//            orderedDithering4x4(img);
-//            errorDiffusion1d(img);
-//            errorDiffusion1dEvenOdd(img);
-//            errorDiffusionFloydSteinberg(img);
-//        errorDiffusionFloydSteinbergEvenOdd(img);
-        if (args[2] != null) {
-            if (Objects.equals(args[2], "thresholding"))
-                img = thresholding(img);
-        }
-        File outputfile = new File(args[1]);
-        if (img != null) {
-            String extension = FilenameUtils.getExtension(args[1]);
-            ImageIO.write(img, extension, outputfile);
-            System.out.println("Success! Image was saved to " + args[1]);
-        } else {
-            System.err.println("ERROR!!!!!! FAIL");
-        }
+            BufferedImage img = ImageIO.read(new File(args[0]));
+            img = toGrayscale(img);
+            if (args.length > 2) {
+                for (int i = 2; i < args.length; i++) {
+                    if (Objects.equals(args[i], "-t"))
+                        thresholding(img);
+                    else if (Objects.equals(args[i], "-rd"))
+                        randomDithering(img);
+                    else if (Objects.equals(args[i], "-od2"))
+                        orderedDithering2x2(img);
+                    else if (Objects.equals(args[i], "-od4"))
+                        orderedDithering4x4(img);
+                    else if (Objects.equals(args[i], "-ed1"))
+                        errorDiffusion1d(img);
+                    else if (Objects.equals(args[i], "-ed1_eo"))
+                        errorDiffusion1dEvenOdd(img);
+                    else if (Objects.equals(args[i], "-edfs"))
+                        errorDiffusionFloydSteinberg(img);
+                    else if (Objects.equals(args[i], "-edfs_eo"))
+                        errorDiffusionFloydSteinbergEvenOdd(img);
+                    else {
+                        System.err.println("Illegal argument: " + args[i]);
+                        return;
+                    }
+                }
+            }
+            File outputfile = new File(args[1]);
+            if (img != null) {
+                String extension = FilenameUtils.getExtension(args[1]);
+                ImageIO.write(img, extension, outputfile);
+                System.out.println("Success! Image was saved to " + args[1]);
+            } else {
+                System.err.println("ERROR! FAIL");
+            }
     }
 }

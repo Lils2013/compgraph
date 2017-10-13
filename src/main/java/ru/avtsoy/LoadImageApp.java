@@ -1,43 +1,19 @@
 package ru.avtsoy;
 
+import org.apache.commons.io.FilenameUtils;
+
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.image.*;
 import java.io.*;
+import java.util.Objects;
 import java.util.Random;
 import javax.imageio.*;
-import javax.swing.*;
 
-/**
- * This class demonstrates how to load an Image from an external file
- */
-public class LoadImageApp extends Component {
+public class LoadImageApp {
 
-    BufferedImage img;
+    private static int THRESHOLD = 130;
 
-    private int THRESHOLD = 130;
-
-    public void paint(Graphics g) {
-        g.drawImage(img, 0, 0, null);
-    }
-
-    public LoadImageApp() {
-        try {
-            img = ImageIO.read(new File("Lenna.png"));
-            toGrayscale(img);
-//            thresholding(img);
-            randomDithering(img);
-            orderedDithering2x2(img);
-            orderedDithering4x4(img);
-            errorDiffusion1d(img);
-            errorDiffusion1dEvenOdd(img);
-            errorDiffusionFloydSteinberg(img);
-            errorDiffusionFloydSteinbergEvenOdd(img);
-        } catch (IOException e) {
-        }
-    }
-
-    private void toGrayscale(BufferedImage img) {
+    private static BufferedImage toGrayscale(BufferedImage img) {
         int width = img.getWidth();
         int height = img.getHeight();
         for (int row = 0; row < height; row++) {
@@ -51,9 +27,10 @@ public class LoadImageApp extends Component {
                 img.setRGB(col, row, new Color(gray, gray, gray).getRGB());
             }
         }
+        return img;
     }
 
-    private void thresholding(BufferedImage img) {
+    private static BufferedImage thresholding(BufferedImage img) {
         int width = img.getWidth();
         int height = img.getHeight();
         for (int row = 0; row < height; row++) {
@@ -62,7 +39,6 @@ public class LoadImageApp extends Component {
                 int r = (rgb >> 16) & 0xff;
                 int g = (rgb >> 8) & 0xff;
                 int b = (rgb) & 0xff;
-                System.out.println(r + " " + g + " " + b);
                 double intensity = 0.299 * r + 0.587 * g + 0.114 * b;
                 if (intensity > THRESHOLD) {
                     img.setRGB(col, row, Color.WHITE.getRGB());
@@ -71,9 +47,10 @@ public class LoadImageApp extends Component {
                 }
             }
         }
+        return img;
     }
 
-    private void randomDithering(BufferedImage img) {
+    private static BufferedImage randomDithering(BufferedImage img) {
         Random random = new Random();
         int width = img.getWidth();
         int height = img.getHeight();
@@ -92,9 +69,10 @@ public class LoadImageApp extends Component {
                 }
             }
         }
+        return img;
     }
 
-    private void orderedDithering2x2(BufferedImage img) {
+    private static BufferedImage orderedDithering2x2(BufferedImage img) {
         int width = img.getWidth();
         int height = img.getHeight();
         int matrix[][] = {
@@ -116,9 +94,10 @@ public class LoadImageApp extends Component {
                 }
             }
         }
+        return img;
     }
 
-    private void orderedDithering4x4(BufferedImage img) {
+    private static BufferedImage orderedDithering4x4(BufferedImage img) {
         int width = img.getWidth();
         int height = img.getHeight();
         int matrix[][] = {
@@ -142,9 +121,10 @@ public class LoadImageApp extends Component {
                 }
             }
         }
+        return img;
     }
 
-    private void errorDiffusion1d(BufferedImage img) {
+    private static BufferedImage errorDiffusion1d(BufferedImage img) {
         int width = img.getWidth();
         int height = img.getHeight();
         int[][] err = new int[width][height];
@@ -164,9 +144,10 @@ public class LoadImageApp extends Component {
                     err[col + 1][row] += error;
             }
         }
+        return img;
     }
 
-    private void errorDiffusion1dEvenOdd(BufferedImage img) {
+    private static BufferedImage errorDiffusion1dEvenOdd(BufferedImage img) {
         int width = img.getWidth();
         int height = img.getHeight();
         int[][] err = new int[width][height];
@@ -206,9 +187,10 @@ public class LoadImageApp extends Component {
                 }
             }
         }
+        return img;
     }
 
-    private void errorDiffusionFloydSteinberg(BufferedImage img) {
+    private static BufferedImage errorDiffusionFloydSteinberg(BufferedImage img) {
         int width = img.getWidth();
         int height = img.getHeight();
         int[][] err = new int[width][height];
@@ -234,9 +216,10 @@ public class LoadImageApp extends Component {
                     err[col + 1][row + 1] += (error) / 16;
             }
         }
+        return img;
     }
 
-    private void errorDiffusionFloydSteinbergEvenOdd(BufferedImage img) {
+    private static BufferedImage errorDiffusionFloydSteinbergEvenOdd(BufferedImage img) {
         int width = img.getWidth();
         int height = img.getHeight();
         int[][] err = new int[width][height];
@@ -284,30 +267,31 @@ public class LoadImageApp extends Component {
                 }
             }
         }
+        return img;
     }
 
-    public Dimension getPreferredSize() {
-        if (img == null) {
-            return new Dimension(100, 100);
+    public static void main(String[] args) throws IOException {
+        BufferedImage img = ImageIO.read(new File(args[0]));
+//        toGrayscale(img);
+//            thresholding(img);
+//            randomDithering(img);
+//            orderedDithering2x2(img);
+//            orderedDithering4x4(img);
+//            errorDiffusion1d(img);
+//            errorDiffusion1dEvenOdd(img);
+//            errorDiffusionFloydSteinberg(img);
+//        errorDiffusionFloydSteinbergEvenOdd(img);
+        if (args[2] != null) {
+            if (Objects.equals(args[2], "thresholding"))
+                img = thresholding(img);
+        }
+        File outputfile = new File(args[1]);
+        if (img != null) {
+            String extension = FilenameUtils.getExtension(args[1]);
+            ImageIO.write(img, extension, outputfile);
+            System.out.println("Success! Image was saved to " + args[1]);
         } else {
-            return new Dimension(img.getWidth(null), img.getHeight(null));
+            System.err.println("ERROR!!!!!! FAIL");
         }
     }
-
-    public static void main(String[] args) {
-
-        JFrame f = new JFrame("Load Image Sample");
-
-        f.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        });
-
-        f.add(new LoadImageApp());
-        f.pack();
-        f.setVisible(true);
-    }
-
-
 }

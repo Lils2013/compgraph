@@ -26,9 +26,13 @@ public class LoadImageApp extends Component {
             img = ImageIO.read(new File("Lenna.png"));
             toGrayscale(img);
 //            thresholding(img);
-//            randomDithering(img);
-//            orderedDithering2x2(img);
+            randomDithering(img);
+            orderedDithering2x2(img);
             orderedDithering4x4(img);
+            errorDiffusion1d(img);
+            errorDiffusion1dEvenOdd(img);
+            errorDiffusionFloydSteinberg(img);
+            errorDiffusionFloydSteinbergEvenOdd(img);
         } catch (IOException e) {
         }
     }
@@ -39,12 +43,12 @@ public class LoadImageApp extends Component {
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int rgb = img.getRGB(col, row);
-                int r = (rgb>>16)&0xff;
-                int g = (rgb>>8)&0xff;
-                int b = (rgb)&0xff;
-                double intensity = 0.299*r + 0.587*g + 0.114*b;
+                int r = (rgb >> 16) & 0xff;
+                int g = (rgb >> 8) & 0xff;
+                int b = (rgb) & 0xff;
+                double intensity = 0.299 * r + 0.587 * g + 0.114 * b;
                 int gray = (int) (Math.round(intensity));
-                img.setRGB(col,row,new Color(gray, gray, gray).getRGB());
+                img.setRGB(col, row, new Color(gray, gray, gray).getRGB());
             }
         }
     }
@@ -55,15 +59,15 @@ public class LoadImageApp extends Component {
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int rgb = img.getRGB(col, row);
-                int r = (rgb>>16)&0xff;
-                int g = (rgb>>8)&0xff;
-                int b = (rgb)&0xff;
+                int r = (rgb >> 16) & 0xff;
+                int g = (rgb >> 8) & 0xff;
+                int b = (rgb) & 0xff;
                 System.out.println(r + " " + g + " " + b);
-                double intensity = 0.299*r + 0.587*g + 0.114*b;
+                double intensity = 0.299 * r + 0.587 * g + 0.114 * b;
                 if (intensity > THRESHOLD) {
-                    img.setRGB(col,row,Color.WHITE.getRGB());
+                    img.setRGB(col, row, Color.WHITE.getRGB());
                 } else {
-                    img.setRGB(col,row,Color.BLACK.getRGB());
+                    img.setRGB(col, row, Color.BLACK.getRGB());
                 }
             }
         }
@@ -77,14 +81,14 @@ public class LoadImageApp extends Component {
             for (int col = 0; col < width; col++) {
                 int thr = random.nextInt(255);
                 int rgb = img.getRGB(col, row);
-                int r = (rgb>>16)&0xff;
-                int g = (rgb>>8)&0xff;
-                int b = (rgb)&0xff;
-                double intensity = 0.299*r + 0.587*g + 0.114*b;
+                int r = (rgb >> 16) & 0xff;
+                int g = (rgb >> 8) & 0xff;
+                int b = (rgb) & 0xff;
+                double intensity = 0.299 * r + 0.587 * g + 0.114 * b;
                 if (intensity > thr) {
-                    img.setRGB(col,row,Color.WHITE.getRGB());
+                    img.setRGB(col, row, Color.WHITE.getRGB());
                 } else {
-                    img.setRGB(col,row,Color.BLACK.getRGB());
+                    img.setRGB(col, row, Color.BLACK.getRGB());
                 }
             }
         }
@@ -94,21 +98,21 @@ public class LoadImageApp extends Component {
         int width = img.getWidth();
         int height = img.getHeight();
         int matrix[][] = {
-                { 1, 3 },
-                { 4, 2 },
+                {1, 3},
+                {4, 2},
         };
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int rgb = img.getRGB(col, row);
-                int r = (rgb>>16)&0xff;
-                int g = (rgb>>8)&0xff;
-                int b = (rgb)&0xff;
-                int gray = (r+g+b)/3;
-                int lol = (int)(gray + 255*(matrix[col % 2][row % 2] / 4.0 - 1.0/2));
+                int r = (rgb >> 16) & 0xff;
+                int g = (rgb >> 8) & 0xff;
+                int b = (rgb) & 0xff;
+                int gray = (r + g + b) / 3;
+                int lol = (int) (gray + 255 * (matrix[col % 2][row % 2] / 4.0 - 1.0 / 2));
                 if (lol > THRESHOLD) {
-                    img.setRGB(col,row,Color.WHITE.getRGB());
+                    img.setRGB(col, row, Color.WHITE.getRGB());
                 } else {
-                    img.setRGB(col,row,Color.BLACK.getRGB());
+                    img.setRGB(col, row, Color.BLACK.getRGB());
                 }
             }
         }
@@ -118,32 +122,173 @@ public class LoadImageApp extends Component {
         int width = img.getWidth();
         int height = img.getHeight();
         int matrix[][] = {
-                { 0, 8, 2, 10 },
-                { 12, 4, 14, 6 },
-                { 3, 11, 1, 9 },
-                { 15, 7, 13, 5 },
+                {0, 8, 2, 10},
+                {12, 4, 14, 6},
+                {3, 11, 1, 9},
+                {15, 7, 13, 5},
         };
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int rgb = img.getRGB(col, row);
-                int r = (rgb>>16)&0xff;
-                int g = (rgb>>8)&0xff;
-                int b = (rgb)&0xff;
-                int gray = (r+g+b)/3;
-                int lol = (int)(gray + 255*(matrix[col % 4][row % 4] / 16.0 - 1.0/2));
+                int r = (rgb >> 16) & 0xff;
+                int g = (rgb >> 8) & 0xff;
+                int b = (rgb) & 0xff;
+                int gray = (r + g + b) / 3;
+                int lol = (int) (gray + 255 * (matrix[col % 4][row % 4] / 16.0 - 1.0 / 2));
                 if (lol > THRESHOLD) {
-                    img.setRGB(col,row,Color.WHITE.getRGB());
+                    img.setRGB(col, row, Color.WHITE.getRGB());
                 } else {
-                    img.setRGB(col,row,Color.BLACK.getRGB());
+                    img.setRGB(col, row, Color.BLACK.getRGB());
                 }
             }
         }
     }
 
+    private void errorDiffusion1d(BufferedImage img) {
+        int width = img.getWidth();
+        int height = img.getHeight();
+        int[][] err = new int[width][height];
+        int error;
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                int rgb = img.getRGB(col, row);
+                int gray = (rgb >> 16) & 0xff; //assuming image is already in greyscale
+                if (gray + err[col][row] > THRESHOLD) {
+                    img.setRGB(col, row, Color.WHITE.getRGB());
+                    error = gray + err[col][row] - 255;
+                } else {
+                    img.setRGB(col, row, Color.BLACK.getRGB());
+                    error = gray + err[col][row];
+                }
+                if (col + 1 < width)
+                    err[col + 1][row] += error;
+            }
+        }
+    }
+
+    private void errorDiffusion1dEvenOdd(BufferedImage img) {
+        int width = img.getWidth();
+        int height = img.getHeight();
+        int[][] err = new int[width][height];
+        int error;
+        for (int row = 0; row < height; row++) {
+            if (row % 2 == 0) {
+                for (int col = 0; col < width; col++) {
+                    int rgb = img.getRGB(col, row);
+                    int gray = (rgb >> 16) & 0xff; //assuming image is already in greyscale
+                    if (gray + err[col][row] > THRESHOLD) {
+                        img.setRGB(col, row, Color.WHITE.getRGB());
+                        error = gray + err[col][row] - 255;
+                    } else {
+                        img.setRGB(col, row, Color.BLACK.getRGB());
+                        error = gray + err[col][row];
+                    }
+                    if (col + 1 < width)
+                        err[col + 1][row] += error;
+                    else if (row + 1 < height)
+                        err[col][row + 1] += error;
+                }
+            } else {
+                for (int col = width - 1; col >= 0; col--) {
+                    int rgb = img.getRGB(col, row);
+                    int gray = (rgb >> 16) & 0xff; //assuming image is already in greyscale
+                    if (gray + err[col][row] > THRESHOLD) {
+                        img.setRGB(col, row, Color.WHITE.getRGB());
+                        error = gray + err[col][row] - 255;
+                    } else {
+                        img.setRGB(col, row, Color.BLACK.getRGB());
+                        error = gray + err[col][row];
+                    }
+                    if (col - 1 >= 0)
+                        err[col - 1][row] += error;
+                    else if (row + 1 < height)
+                        err[col][row + 1] += error;
+                }
+            }
+        }
+    }
+
+    private void errorDiffusionFloydSteinberg(BufferedImage img) {
+        int width = img.getWidth();
+        int height = img.getHeight();
+        int[][] err = new int[width][height];
+        int error;
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                int rgb = img.getRGB(col, row);
+                int gray = (rgb >> 16) & 0xff; //assuming image is already in greyscale
+                if (gray + err[col][row] > THRESHOLD) {
+                    img.setRGB(col, row, Color.WHITE.getRGB());
+                    error = gray + err[col][row] - 255;
+                } else {
+                    img.setRGB(col, row, Color.BLACK.getRGB());
+                    error = gray + err[col][row];
+                }
+                if (col + 1 < width)
+                    err[col + 1][row] += (7 * error) / 16;
+                if (col - 1 >= 0 && row + 1 < height)
+                    err[col - 1][row + 1] += (3 * error) / 16;
+                if (row + 1 < height)
+                    err[col][row + 1] += (5 * error) / 16;
+                if (col + 1 < width && row + 1 < height)
+                    err[col + 1][row + 1] += (error) / 16;
+            }
+        }
+    }
+
+    private void errorDiffusionFloydSteinbergEvenOdd(BufferedImage img) {
+        int width = img.getWidth();
+        int height = img.getHeight();
+        int[][] err = new int[width][height];
+        int error;
+        for (int row = 0; row < height; row++) {
+            if (row % 2 == 0) {
+                for (int col = 0; col < width; col++) {
+                    int rgb = img.getRGB(col, row);
+                    int gray = (rgb >> 16) & 0xff; //assuming image is already in greyscale
+                    if (gray + err[col][row] > THRESHOLD) {
+                        img.setRGB(col, row, Color.WHITE.getRGB());
+                        error = gray + err[col][row] - 255;
+                    } else {
+                        img.setRGB(col, row, Color.BLACK.getRGB());
+                        error = gray + err[col][row];
+                    }
+                    if (col + 1 < width)
+                        err[col + 1][row] += (7 * error) / 16;
+                    if (col - 1 >= 0 && row + 1 < height)
+                        err[col - 1][row + 1] += (3 * error) / 16;
+                    if (row + 1 < height)
+                        err[col][row + 1] += (5 * error) / 16;
+                    if (col + 1 < width && row + 1 < height)
+                        err[col + 1][row + 1] += (error) / 16;
+                }
+            } else {
+                for (int col = width - 1; col >= 0; col--) {
+                    int rgb = img.getRGB(col, row);
+                    int gray = (rgb >> 16) & 0xff; //assuming image is already in greyscale
+                    if (gray + err[col][row] > THRESHOLD) {
+                        img.setRGB(col, row, Color.WHITE.getRGB());
+                        error = gray + err[col][row] - 255;
+                    } else {
+                        img.setRGB(col, row, Color.BLACK.getRGB());
+                        error = gray + err[col][row];
+                    }
+                    if (col - 1 >= 0)
+                        err[col - 1][row] += (7 * error) / 16;
+                    if (col - 1 >= 0 && row + 1 < height)
+                        err[col - 1][row + 1] += (error) / 16;
+                    if (row + 1 < height)
+                        err[col][row + 1] += (5 * error) / 16;
+                    if (col + 1 < width && row + 1 < height)
+                        err[col + 1][row + 1] += (3 * error) / 16;
+                }
+            }
+        }
+    }
 
     public Dimension getPreferredSize() {
         if (img == null) {
-            return new Dimension(100,100);
+            return new Dimension(100, 100);
         } else {
             return new Dimension(img.getWidth(null), img.getHeight(null));
         }
@@ -153,7 +298,7 @@ public class LoadImageApp extends Component {
 
         JFrame f = new JFrame("Load Image Sample");
 
-        f.addWindowListener(new WindowAdapter(){
+        f.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 System.exit(0);
             }
